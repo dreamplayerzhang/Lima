@@ -54,6 +54,9 @@ endif()
 
 
 if(UNIX)
+# numa is needed for buffer management
+  find_package(Numa REQUIRED)
+
 #--------------------------------------------------------------------------------
 # Spec-like shared memory
 #--------------------------------------------------------------------------------
@@ -420,6 +423,9 @@ target_include_directories(limacore PUBLIC
 target_include_directories(limacore PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/third-party/Processlib/core/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/third-party/Processlib/tasks/include")
+if(UNIX)
+    target_include_directories(limacore PRIVATE "${NUMA_INCLUDE_DIR}")
+endif()
 if(LIMA_ENABLE_SPS_IMAGE)
     target_include_directories(limacore PRIVATE "${CMAKE_SOURCE_DIR}/third-party/Sps/Include")
 endif()
@@ -439,6 +445,7 @@ endif()
 if(UNIX)
     add_definitions(-DHAS_INOTIFY)
     target_link_libraries(limacore "rt")
+    target_link_libraries(limacore ${NUMA_LIBRARY})
 endif()
 target_link_libraries(limacore processlib)
 target_link_libraries(limacore ${saving_libs} ${extra_libs})
